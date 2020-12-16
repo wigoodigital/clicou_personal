@@ -663,7 +663,7 @@ export default function SectionAnamnese(props) {
         setActiveField(["fazAulas"]);
         break;      
       case 6:
-        setActiveField(["sedentario", "sedentarioTempo"]);
+        setActiveField(["sedentario", "sedenTariotempo"]);
         break;      
       case 7:
         setActiveField(["tempoPorDia"]);
@@ -693,7 +693,7 @@ export default function SectionAnamnese(props) {
         setActiveField(["nutricionista"]);
         break;      
       case 16:
-        setActiveField(["personalTrainer"]);
+        setActiveField(["peronalTrainer"]);
         break;      
       case 17:
         setActiveField(["equipamentos", "qualEquipamentos"]);
@@ -753,7 +753,7 @@ export default function SectionAnamnese(props) {
 
     sedentario: "TESTE",
 
-    sedentarioTempo: "TESTE",
+    sedenTariotempo: "TESTE",
 
     reclusaoTreino: "TESTE",
 
@@ -780,7 +780,7 @@ export default function SectionAnamnese(props) {
 
     nutricionista: "TESTE",
 
-    personalTrainer: "TESTE",
+    peronalTrainer: "TESTE",
 
     equipamentos: "TESTE"
 
@@ -1190,7 +1190,7 @@ export default function SectionAnamnese(props) {
                
 
                           <input hidden name="sedentario" type="text" ref={register} />
-                          <input hidden name="sedentarioTempo" type="text" ref={register} />
+                          <input hidden name="sedenTariotempo" type="text" ref={register} />
 
                           {
                             !isOutro ? (
@@ -1213,15 +1213,15 @@ export default function SectionAnamnese(props) {
                                                               
                                 <label>Há quanto tempo?</label>
                                 <br/>                        
-                                <Button color="primary" fullWidth onClick={() => setValueForm("sedentarioTempo", "6 meses")}>
+                                <Button color="primary" fullWidth onClick={() => setValueForm("sedenTariotempo", "6 meses")}>
                                   6 meses
                                 </Button>
                                 
-                                <Button color="primary" fullWidth onClick={() => setValueForm("sedentarioTempo", "6 meses a 2 anos")}>
+                                <Button color="primary" fullWidth onClick={() => setValueForm("sedenTariotempo", "6 meses a 2 anos")}>
                                   6 meses a 2 anos
                                 </Button>
                                 
-                                <Button color="primary" fullWidth onClick={() => setValueForm("sedentarioTempo", "Há mais de 2 anos")}>
+                                <Button color="primary" fullWidth onClick={() => setValueForm("sedenTariotempo", "Há mais de 2 anos")}>
                                   Há mais de 2 anos
                                 </Button>
 
@@ -1816,14 +1816,14 @@ export default function SectionAnamnese(props) {
                       <GridContainer justify="center"> 
                         <GridItem xs={12} sm={12} md={8}>
                           
-                          <input hidden name="personalTrainer" type="text" ref={register} />                          
+                          <input hidden name="peronalTrainer" type="text" ref={register} />                          
                           
                           <label>Faz acompanhamento com um(a) personal trainer?</label>
                           <br/>                        
-                          <Button color="primary" fullWidth onClick={() => setValueForm("personalTrainer", "SIM")}>
+                          <Button color="primary" fullWidth onClick={() => setValueForm("peronalTrainer", "SIM")}>
                             Sim
                           </Button>                               
-                          <Button color="secondary" fullWidth onClick={() => setValueForm("personalTrainer", "NÃO")}>
+                          <Button color="secondary" fullWidth onClick={() => setValueForm("peronalTrainer", "NÃO")}>
                             Não
                           </Button>
 

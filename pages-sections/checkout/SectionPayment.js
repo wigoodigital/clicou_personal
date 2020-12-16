@@ -23,6 +23,7 @@ import Email from "@material-ui/icons/Email";
 import EventIcon from '@material-ui/icons/Event';
 import Favorite from "@material-ui/icons/Favorite";
 import AssignmentInd from "@material-ui/icons/AssignmentInd";
+import CircularProgress from '@material-ui/core/CircularProgress';
 // core components
 import GridContainer from "components/Grid/GridContainer.js";
 import GridItem from "components/Grid/GridItem.js";
@@ -260,6 +261,7 @@ function isValidDateCard(date) {
   return /^((0[1-9])|(1[0-2]))\/((2009)|(20[1-2][0-9]))$/.test(date);
 }
 
+
 function getCardFlag(cardnumber) {
   var cardnumber = cardnumber.replace(/[^0-9]+/g, '');
 
@@ -308,6 +310,7 @@ yup.addMethod(yup.string, "card", function(message) {
 
 
 
+
 const SignupSchema = yup.object().shape({  
   id: yup
     .string(),    
@@ -329,12 +332,62 @@ const SignupSchema = yup.object().shape({
   cpf: yup
     .string()
     .cpf("Por favor, informe um CPF válido") 
-    .required(),   
-     
-  
-
+    .required(), 
+  cupom: yup
+    .string()
+      
+    
 
 });
+
+
+const formatValueParcela = (value) => {
+  let returnValue =  new String(value).replace(",", ".");  
+  return parseFloat(returnValue).toFixed(2); 
+}
+
+const formatValuePresentation = (value) => {
+  let returnDecimal = formatValueParcela(value);
+  let returnValue =  new String(returnDecimal).replace(".", ",");
+  return returnValue;    
+}
+
+const descontoTotal = (premios, plan) => {
+ 
+  let valorDesconto = 0.0;
+
+  premios.listaPremios.map((premio, i) => {
+    console.log("formatValueParcela(premio.valorDesconto)" );
+    console.log(formatValueParcela(premio.valorDesconto) );
+    valorDesconto = parseFloat( valorDesconto + parseFloat(premio.valorDesconto) );
+
+
+
+    valorDesconto = parseFloat( valorDesconto + ( plan.mensalidade * ( parseFloat(premio.percentualDesconto) / 100 ) ) );
+  })
+
+  console.log("valorDesconto");
+  console.log(valorDesconto);
+
+  return parseFloat( valorDesconto );    
+}
+
+const descontoParcela = (descontos, parcela) => {
+ 
+  let valorParcela = formatValueParcela(parcela);
+
+  valorParcela = valorParcela - formatValueParcela(descontos.valorDesconto);
+
+  valorParcela = valorParcela - ( parcela * ( parseFloat(descontos.percentualDesconto) / 100 ) )
+
+
+  console.log("valorParcela");
+  console.log(valorParcela);
+
+  return parseFloat( valorParcela ).toFixed(2);    
+}
+
+
 
 // const schema = yup.object().shape({
 //   first: yup.string().required(),
@@ -398,8 +451,125 @@ export default function SectionPayment(props) {
   const [isAluno, setIsAluno] = React.useState(false);
   const [activeForm, setActiveForm] = React.useState(0);
   // const [activeField, setActiveField] = React.useState("first");
-  const [activeField, setActiveField] = React.useState(["id","number","name","validade", "cvv", "cpf"]);
+  const [activeField, setActiveField] = React.useState(["id","number","name","validade", "cvv", "cpf", "cupom"]);
   const [isDisableNext, setIsDisableNext] = React.useState(true);
+  const [isLoadingCupom, setIsLoadingCupom] = React.useState(false);  
+  const [insertCupom, setInsertCupom] = React.useState(false);
+  const [listaPremios, setListaPremios] = React.useState(
+    {
+      numeroCupom: "",
+      listaPremios: [
+        {
+          percentualDesconto: "10",
+          valorDesconto: "10",
+          descricaoPremio: "PARCELA 1",
+          tipoPremio: "MENSALIDADE"
+        },
+        {
+          percentualDesconto: "10",
+          valorDesconto: "0",
+          descricaoPremio: "PARCELA 2",
+          tipoPremio: "MENSALIDADE"
+        },
+        {
+          percentualDesconto: "10",
+          valorDesconto: "0",
+          descricaoPremio: "PARCELA 3",
+          tipoPremio: "MENSALIDADE"
+        },
+        {
+          percentualDesconto: "10",
+          valorDesconto: "0",
+          descricaoPremio: "PARCELA 4",
+          tipoPremio: "MENSALIDADE"
+        },
+        {
+          percentualDesconto: "10",
+          valorDesconto: "0",
+          descricaoPremio: "PARCELA 5",
+          tipoPremio: "MENSALIDADE"
+        },
+        {
+          percentualDesconto: "10",
+          valorDesconto: "0",
+          descricaoPremio: "PARCELA 6",
+          tipoPremio: "MENSALIDADE"
+        },
+        {
+          percentualDesconto: "10",
+          valorDesconto: "0",
+          descricaoPremio: "PARCELA 7",
+          tipoPremio: "MENSALIDADE"
+        },
+        {
+          percentualDesconto: "10",
+          valorDesconto: "0",
+          descricaoPremio: "PARCELA 8",
+          tipoPremio: "MENSALIDADE"
+        },
+        {
+          percentualDesconto: "10",
+          valorDesconto: "0",
+          descricaoPremio: "PARCELA 9",
+          tipoPremio: "MENSALIDADE"
+        },
+        {
+          percentualDesconto: "10",
+          valorDesconto: "0",
+          descricaoPremio: "PARCELA 10",
+          tipoPremio: "MENSALIDADE"
+        },
+        {
+          percentualDesconto: "10",
+          valorDesconto: "0",
+          descricaoPremio: "PARCELA 11",
+          tipoPremio: "MENSALIDADE"
+        },
+        {
+          percentualDesconto: "10",
+          valorDesconto: "0",
+          descricaoPremio: "PARCELA 12",
+          tipoPremio: "MENSALIDADE"
+        },
+       
+   
+      ]
+    }
+  );
+  const [plan, setPlan] = React.useState(
+    {
+      "parcelamentoOperadora":"True",
+      "maxDivisao":1,
+      "descricaoEncantamento":"",
+      "nome":"",
+      "mesAnuidade":"Parcela 0",
+      "codigo":2,
+      "adesao":0.0,
+      "anuidade":0.0,
+      "horario":"LIVRE",
+      "fidelidade":12,
+      "mensalidade":39.9,
+      "primeiraParcela":39.9,
+      "valorProdutos":0.0,
+      "produtos":"",
+      "inicioMinimo":null,
+      "modalidades":[
+         "ONLINE"
+      ],
+      "diasVencimento":[
+         
+      ],
+      "inicioFuturo":"False",
+      "anuidadeAgora":"False",
+      "qtdCreditoPlanoCredito":"0",
+      "regimeRecorrencia":"False",
+      "matricula":"0.0",
+      "parcelasAnuidade":[
+         
+      ]
+   }
+  );
+       
   const [error, setError] = useState(false);
 
   const [activeCard, setActiveCard] = React.useState(nocard);
@@ -415,15 +585,20 @@ export default function SectionPayment(props) {
 
   const handleNext = async (type) => {
 
-    // console.log(activeField);
-    const result = await trigger(activeField)
-    // console.log(result);
+    console.log(activeField);
+    const result = await trigger(activeField);
+    // const result = await trigger();
+    console.log(result);    
+
+    console.log("cupom");
+    console.log(getValues("cupom"));
+    getCupom(getValues("cupom"));
   
 
-    if(result) { 
+    if(result) {       
       console.log(getValues());
       const cardForm = getValues();
-      const codBrand= getBrandCod(cardForm.number);
+      const codBrand= getBrandCod(cardForm.number);      
 
 
       if(activeForm == 0){   
@@ -443,11 +618,12 @@ export default function SectionPayment(props) {
               cvv: cardForm.cvv,
               validade: cardForm.validade,
               // brand: codBrand,
-              cpftitularcard: cardForm.cpf,              
+              cpftitularcard: cardForm.cpf,  
+              numeroCupomDesconto: cardForm.cupom,            
               anamnese:{
                 ...prevDataSale.anamnese,                
-                created_at: dia + "/" + mes + "/" + ano,
-                updated_at: dia + "/" + mes + "/" + ano,
+                // created_at: dia + "/" + mes + "/" + ano,
+                // updated_at: dia + "/" + mes + "/" + ano,
               },                  
           }
         });    
@@ -558,12 +734,13 @@ export default function SectionPayment(props) {
             unidade: 1,
             plano: res.data.planos[0].codigo                     
           }
-        });            
+        });    
+        
+        setPlan(res.data.planos[0]);
         
       })
       .catch((error) => {
-        console.log(error);
-        setError(true);
+        console.log(error);        
       })      
   };
 
@@ -701,6 +878,115 @@ export default function SectionPayment(props) {
     return nocard;
 }
 
+const getCupom = async (cupom) => {    
+  setIsLoadingCupom(true);  
+  setInsertCupom(false);
+  setError(false);  
+
+  await axios.post(`https://admin.justfit.com.br/app.justfit/api/LoadPersonalOnline/GetCupomInfo?cupom=${cupom}`)
+    .then(res => {
+
+      if(res.data.code != "0"){
+        console.log("error getCupom");    
+        setError(true);    
+        return false;
+      }
+      console.log(res.data);     
+      
+      // const withoutAspas = new String(res.data.cupom).replace(/[']/g,'"');           
+      // const withoutAspas2 = new String(withoutAspas).replace('"return":"{"','"return": {"');     
+      // const withoutAspas3 = new String(withoutAspas2).replace('}"}', '}}');   
+      
+      // console.log(JSON.parse(withoutAspas3));     
+
+      console.log(res.data.cupom.cupom);     
+      
+      setInsertCupom(true);
+
+      setListaPremios(res.data.cupom.cupom);
+      window.scrollTo(0, 0);
+      
+
+      
+    })
+    .catch((error) => {
+      console.log(error);
+      setError(true);
+    })
+    .finally(() => {
+      setIsLoadingCupom(false);  
+    });
+};
+
+
+const  getPremios = (premios) => {
+
+  return (
+    <GridItem xs={12} sm={12} md={12}>   
+      {/* <Card pricing plain className={classes.marginZero}>
+        <CardBody pricing plain> */}
+          <h5 className={classes.cardCategory} style={{ color: "#425cc7" }}>Cupom aplicado</h5>                                                               
+          <small style={{ fontSize: "1rem", fontWeight: "900" }}>{'\u00A0'} {premios.numeroCupom}</small>
+          <ul className={classes.itensResumo}>
+            {premios.listaPremios.map((premio, i) => ( 
+              <>
+                <li>
+                  <GridContainer>
+                    <GridItem xs={8} sm={8} md={8} style={ { textAlign: "left" } }>
+                      {premio.descricaoPremio}  
+                    </GridItem>                    
+                    <GridItem xs={4} sm={4} md={4}>                        
+                      { i == 0 ? (   
+                        <>                   
+                        R$ { formatValuePresentation( descontoParcela( listaPremios.listaPremios[i], plan.primeiraParcela ) ) } 
+                        </>
+                      ) : (
+                        <>
+                        R$ { formatValuePresentation( descontoParcela( listaPremios.listaPremios[i], plan.mensalidade ) ) }  
+                        </>
+                      )
+
+                      }
+                      
+                    </GridItem>                    
+                  </GridContainer>
+
+                  
+                </li>
+              </>            
+            ))}
+
+            {premios.listaPremios.length < plan.fidelidade && ( 
+              <li>
+                <GridContainer>
+                  <GridItem xs={8} sm={8} md={8} style={ { textAlign: "left" } }>
+                    DEMAIS PARCELAS
+                  </GridItem>                    
+                  <GridItem xs={4} sm={4} md={4}>  
+                    R$ {formatValuePresentation(plan.mensalidade)}
+                  </GridItem>                    
+                </GridContainer>
+              </li>
+            )}
+
+            {/* <li>
+              <Check/> Treinos Personalizados
+            </li> */}
+          </ul>
+        {/* </CardBody> */}
+
+      {/* </Card>                     */}
+      
+    </GridItem>
+    )
+
+
+
+
+}
+
+
+
 
 
 
@@ -742,18 +1028,7 @@ export default function SectionPayment(props) {
 
                       <CardBody>
 
-                      {error && ( 
-                        <SnackbarContent
-                          message={
-                            <span>
-                              <b>Não encontramos seu CEP</b> <br/> Tente novamente
-                            </span>
-                          }
-                          // close
-                          color="warning"
-                          icon="info_outline"
-                        />
-                      )} 
+                      
 
                       <Card color="info" className={classes.containerCart}>
                         <CardBody color className={classes.noPaddingBottom}>
@@ -882,6 +1157,55 @@ export default function SectionPayment(props) {
                               }}
                             />   
                           </GridItem>
+                          <GridItem xs={8} sm={8} md={9}>
+                          
+                            <CustomInput
+                              labelText="Inserir cupom"
+                              labelError={errors.cupom && errors.cupom.message}                          
+                              error={errors.cupom ? true : false}
+                              id="cupom"
+                              formControlProps={{
+                                fullWidth: true
+                              }}                            
+                              inputProps={{
+                                name: "cupom",
+                                inputRef: register, 
+                                onBlur: () => getCupom(getValues('cupom'))
+                                                                                                                                                     
+                              }}
+                            />   
+                          </GridItem>
+                         
+                          <GridItem xs={4} sm={4} md={3}>   
+                            {
+                              isLoadingCupom ? (
+                                <CircularProgress style={{ color: "#425CD0", position:"absolute", bottom:"20px", left:"20px" }} size={30}/>
+
+                              ) : (
+                                <Button style={{ position:"absolute", bottom:"10px", left:"10px" }} color="primary" onClick={ () => getCupom(getValues('cupom'))}>
+                                  Ok
+                                </Button>
+                              )
+
+                            }                       
+                            
+                          </GridItem>
+                          {error && ( 
+                            <GridItem xs={12} sm={12} md={12}>   
+                              <SnackbarContent
+                                message={
+                                  <span>
+                                    <b>Cupom não encontrado</b> <br/> Insira um cupom válido
+                                  </span>
+                                }
+                                // close
+                                color="danger"
+                                icon="info_outline"
+                              />
+                            </GridItem>   
+                          )} 
+                          
+                          
                           
                         </GridContainer>                 
                     
@@ -889,60 +1213,31 @@ export default function SectionPayment(props) {
 
                     </Grow>
 
-                    {/* <CardFooter className={classes.justifyContentBetween}>    */}
+                    
                     <CardFooter className={classes.textCenter}>   
                       <GridContainer justify="center" style={{ margin: "0", width: "100%" }}> 
-                        {/* <GridItem xs={12} sm={12} md={12}>
-                          <FormControl required error={errors.checkboxInput} component="fieldset" className={classes.formControl}>                      
-                            <FormGroup>
-
-                              <FormControlLabel
-                                control={
-                                  <Checkbox
-                                    tabIndex={-1}
-                                    onClick={() => handleToggle(1)}
-                                    checkedIcon={
-                                      <Check className={classes.checkedIcon} />
-                                    }
-                                    icon={<Check className={classes.uncheckedIcon} />}
-                                    classes={{
-                                      checked: classes.checked,
-                                      root: classes.checkRoot
-                                    }}
-                                    name="checkboxInput"
-                                    inputRef={ register }                          
-                                  />
-                                }                      
-                                classes={{ label: classes.label }}
-                                label="I'm not a robot"
-                              />  
-                            </FormGroup>
-                            <FormHelperText>{errors.checkboxInput ? errors.checkboxInput.message : ""}</FormHelperText>
-                          </FormControl>                 
-                        </GridItem>  */}
+                        
                         <GridItem xs={12} sm={12} md={12}>
 
-                          {/* <Button type="submit" color="primary" className={classes.pullRight}>
-                            Send Message
-                          </Button> */}
-                          
 
-                          {/* <Button color="primary" disabled className={classes.pullRight} onClick={handleNext}> */}
-                          <Button color="primary" fullWidth onClick={handleNext}>
-                            Próximo
-                          </Button>
-                                                  
+                          {
+                            isLoadingCupom ? (
+                              <CircularProgress style={{ color: "#425CD0" }} size={30}/>
+
+                            ) : (
+                              <Button color="primary" fullWidth onClick={handleNext}>
+                                Próximo
+                              </Button>
+                                            
+                            )
+
+                          }  
+                          
+                                   
                           
                         </GridItem> 
                         <GridItem xs={12} sm={12} md={12}>
-
-                          {/* <Button type="submit" color="primary" className={classes.pullRight}>
-                            Send Message
-                          </Button> */}
                           
-                          
-                          {/* <Button color="primary" className={classes.pullRight} onClick={ () => setIsAluno(!isAluno) }> */}
-                          {/* <Button color="primary" className={classes.pullRight} onClick={handleBack}> */}
                           <Button simple color="primary" fullWidth onClick={handleBack}>
                             Voltar
                           </Button>
@@ -983,30 +1278,36 @@ export default function SectionPayment(props) {
 
                       <CardBody>
 
-                      {error && ( 
-                        <SnackbarContent
-                          message={
-                            <span>
-                              <b>Não encontramos seu CEP</b> <br/> Tente novamente
-                            </span>
-                          }
-                          // close
-                          color="warning"
-                          icon="info_outline"
-                        />
-                      )} 
+             
 
                         <GridContainer justify="center"> 
                           <GridItem xs={12} sm={12} md={12}>
                             <Card pricing plain className={classes.marginZero}>
                               <CardBody pricing plain>
-                                <h5 className={classes.cardCategory} style={{ color: "#425cc7" }}>Plano Anual Start</h5>
+                                <h5 className={classes.cardCategory} style={{ color: "#425cc7" }}>Plano <br/> {plan.nome}</h5>
                                 <hr/>
-                                <small style={{ fontSize: "1rem" }}>{'\u00A0'} 12 parcelas mensais de</small>
-                                <h1 className={classes.cardTitle} style={{ color: "#425cc7", marginTop: "0.75rem", marginBottom: "0 !important" }}>
-                                  <small style={{ color: "#425cc7" }}>R$</small> 39,90 
-                                </h1>
-                                <small style={{ fontSize: "0.7rem" }}>{'\u00A0'} Valor anual do plano: R$ 478,80</small>
+                                
+                                {
+                                  insertCupom ? (
+                                    <>
+                                      <small style={{ fontSize: "1rem" }}>{'\u00A0'} Primeira mensalidade</small>
+                                      <h1 className={classes.cardTitle} style={{ color: "#425cc7", marginTop: "0.75rem", marginBottom: "0 !important" }}>
+                                        <small style={{ color: "#425cc7" }}>R$</small> { formatValuePresentation( descontoParcela( listaPremios.listaPremios[0], plan.primeiraParcela ) ) } 
+                                      </h1>      
+                                      <small style={{ fontSize: "0.7rem" }}>{'\u00A0'} Valor anual do plano: R$ { formatValuePresentation( (formatValueParcela(plan.mensalidade) * formatValueParcela(plan.fidelidade)) - descontoTotal( listaPremios, plan ) ) }</small>
+                                      {getPremios(listaPremios)}    
+                                    </>                  
+                                  ): (
+                                    <>
+                                      <small style={{ fontSize: "1rem" }}>{'\u00A0'} {plan.fidelidade} parcelas de</small>
+                                      <h1 className={classes.cardTitle} style={{ color: "#425cc7", marginTop: "0.75rem", marginBottom: "0 !important" }}>
+                                        <small style={{ color: "#425cc7" }}>R$</small> {formatValuePresentation(plan.mensalidade)}
+                                      </h1>
+                                      <small style={{ fontSize: "0.7rem" }}>{'\u00A0'} Valor anual do plano: R$ { formatValuePresentation( (formatValueParcela(plan.mensalidade) * formatValueParcela(plan.fidelidade)) ) }</small>
+                                    </>
+                                  )                            
+                                }
+        
                                 <ul className={classes.itensResumo}>
                                   <li>
                                     <Check/> Treinos Personalizados

@@ -48,9 +48,9 @@ export default function ErrorPage({ ...rest }) {
           <GridContainer>
             <GridItem md={12}>
               <h1 className={classes.title}>404</h1>
-              <h2 className={classes.subTitle}>Page not found :(</h2>
+              <h2 className={classes.subTitle}>Página não encontrada :(</h2>
               <h4 className={classes.description}>
-                Ooooups! Looks like you got lost.
+                Recarregue a página e tente novamente
               </h4>
             </GridItem>
           </GridContainer>

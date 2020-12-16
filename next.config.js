@@ -11,6 +11,7 @@ const isProd = process.env.NODE_ENV === 'production'
 module.exports = withPlugins([[withSass], [withImages], [withCSS], [withFonts]], {
   enableSvg: true,
   assetPrefix: isProd ? '/checkout' : '',
+  // assetPrefix: isProd ? '/clicou-personal/checkout' : '',
   webpack(config, options) {
     config.resolve.modules.push(path.resolve("./"));
     return config;

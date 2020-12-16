@@ -30,6 +30,7 @@ import iphone2 from "assets/img/phoneApp.png";
 import clicouApp from "assets/img/clicouApp.png";
 import bg9 from "assets/img/bg9.jpg";
 
+import iconeTreino from "assets/img/icone-treino.png";
 import logoTecnofit from "assets/img/logo-tecnofit.png";
 import logoTelegram from "assets/img/logo-telegram.png";
 import iconLove from "assets/img/like-love.png";
@@ -109,7 +110,7 @@ export default function SectionFeatures(props) {
             >            
               <InfoArea                
                 iconImage={iconLove}                
-                title={props.dataSale.customer.name} 
+                title={props.dataSale.nome} 
                 descriptionLarge="Sua matrícula foi realizada com sucesso!"
                 iconColor="info"   
                 className={classes.textLeft}   
@@ -127,7 +128,7 @@ export default function SectionFeatures(props) {
               <div className={classes.bubble}>
                 Seu treino já está sendo preparado.
                 <br/>
-                Em até 48 horas você poderá acessá-lo através do aplicativo Tecnofit.
+                Em até 48 horas você poderá acessá-lo através do aplicativo de treinos.
               </div>
             </GridItem>
           </GridContainer>
@@ -156,13 +157,13 @@ export default function SectionFeatures(props) {
             <GridItem xs={12} sm={12} md={12} lg={6} className={classes.mlAuto}>              
               <InfoArea
                 titlePasso="Passo 1" 
-                iconImage={logoTecnofit}                 
+                iconImage={iconeTreino}                 
                 title="Baixe o Aplicativo de treinos:"
                 description="Com ele você visualiza seus treinos, vídeos explicativos e acompanha seus resultados. Tudo de forma simples e rápida."
                 iconColor="info" 
                 app   
-                android="https://play.google.com/store/apps/details?id=br.com.tecnofit.mobileapp"
-                ios="https://apps.apple.com/br/app/tecnofit/id1109478634"     
+                android="https://play.google.com/store/apps/details?id=com.pacto&hl=pt_BR"
+                ios="https://apps.apple.com/br/app/treino/id862662527"     
                 className={classes.paddingTopZero}                       
               />
  
@@ -170,13 +171,14 @@ export default function SectionFeatures(props) {
             <GridItem xs={12} sm={12} md={12} lg={6} className={classes.mlAuto}>              
               <InfoArea
                 titlePasso="Passo 2"                                     
-                description="Você receberá um e-mail para Confirmar que possui acesso ao e-mail cadastrado."     
+                description="Você receberá um e-mail de noreply@pactosolucoes.com.br com os dados de acesso e resumo de compra. Caso não tenha recebido, verifique a pasta de Spam ou Lixo Eletrônico."     
                 className={classes.paddingTopZero}        
                 
               />
               <InfoArea
                 titlePasso="Passo 3" 
-                description='Abra o app Tecnofit, clique em "Novo Cadastro", informe o mesmo e-mail cadastrado na matrícula.'      
+                // description='Abra o app Tecnofit, clique em "Novo Cadastro", informe o mesmo e-mail cadastrado na matrícula.'      
+                description='Siga o passo a passo enviado por e-mail.'      
                 className={classes.paddingTopZero}                    
               />
  

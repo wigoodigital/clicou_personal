@@ -69,12 +69,12 @@ export default function Header(props) {
     <AppBar className={appBarClasses}>
       <Toolbar className={classes.container}>
         <Button className={classes.title}>
-          <Link href="/historico-do-aluno">            
+          <Link href="/checkout">            
             <a>
               {brand ? brand : ""}
               <div className={classes.imgContainer}>
                 {/* <img src={imgBrand} alt="..." className={classes.img} /> */}
-                <img src={imgBrand !== undefined ? imgBrand : logo} alt="..." className={classes.img} />
+                <img src={imgBrand !== undefined ? imgBrand : logo} alt="..." className={classes.img} style={{ width: "150px" }}/>
               </div>
             </a>
           </Link>
